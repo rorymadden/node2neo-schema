@@ -131,6 +131,7 @@ The structure of the userSchema response is as follows:
   _indexes = ['email'];
   _constraints = ['securityNumber'];
   _appliedConstraints = []; // this is used as Neo4j errors if you attempt to re-apply a constraint
+  _appliedIndexes = [];
 }
 ```
 

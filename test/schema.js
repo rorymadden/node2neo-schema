@@ -85,11 +85,9 @@ describe("schema", function(){
         first_name: 'Rory',
         last_name: 'Madden'
       }
-      userSchema.validate(user, function(err, userUpdated){
-        should.not.exist(err);
-        userUpdated.name.should.equal('Rory Madden');
-        done();
-      });
+      var updatedUser = userSchema.validate(user);
+      updatedUser.name.should.equal('Rory Madden');
+      done();
     });
     it("should fail on invalid virtual definition", function(done){
       var schema = {
@@ -131,10 +129,9 @@ describe("schema", function(){
       }, {label:' Story'});
 
       story.subSchema(tag, 'tags', 'tagged');
-      story._subSchemas.length.should.equal(1);
-      story._subSchemas[0].name.should.equal('tags');
-      story._subSchemas[0].relationship.should.equal('tagged');
-      story._subSchemas[0].schema.should.equal(tag);
+      should.exist(story._subSchemas.tags);
+      story._subSchemas.tags.relationship.should.equal('tagged');
+      story._subSchemas.tags.schema.should.equal(tag);
       done();
     });
   });
@@ -156,21 +153,19 @@ describe("schema", function(){
         age: 30,
         gender: 'male'
       };
-      validateSchema.validate(user, function(err){
-        should.exist(err);
-        err.message.should.equal('You are missing required field(s): first');
-        done();
-      });
+      var err = validateSchema.validate(user);
+      (err instanceof Error).should.be.ok;
+      err.message.should.equal('You are missing required field(s): first');
+      done();
     });
     it("should fail on missing required fields", function(done){
       user = {
         gender: 'male'
       };
-      validateSchema.validate(user, function(err){
-        should.exist(err);
-        err.message.should.equal('You are missing required field(s): first,age');
-        done();
-      });
+      var err = validateSchema.validate(user);
+      (err instanceof Error).should.be.ok;
+      err.message.should.equal('You are missing required field(s): first,age');
+      done();
     });
     it("should fail on regex failure", function(done){
       user = {
@@ -178,11 +173,10 @@ describe("schema", function(){
         age: 30,
         gender: 'male'
       };
-      validateSchema.validate(user, function(err){
-        should.exist(err);
-        err.message.should.equal('first: blue does not match the required pattern');
-        done();
-      });
+      var err = validateSchema.validate(user);
+      (err instanceof Error).should.be.ok;
+      err.message.should.equal('first: blue does not match the required pattern');
+      done();
     });
     it("should trim and lowercase", function(done){
       user = {
@@ -190,10 +184,9 @@ describe("schema", function(){
         age: 30,
         gender: 'male'
       };
-      validateSchema.validate(user, function(err, userUpdated){
-        should.not.exist(err);
-        done();
-      });
+      var userUpdated = validateSchema.validate(user);
+      userUpdated.first.should.equal('name');
+      done();
     });
     it("should fail on invalid number: below min", function(done){
       user = {
@@ -201,11 +194,10 @@ describe("schema", function(){
         age: 3,
         gender: 'male'
       };
-      validateSchema.validate(user, function(err){
-        should.exist(err);
-        err.message.should.equal('age: 3 is less than the minimum of 5');
-        done();
-      });
+      var err = validateSchema.validate(user);
+      (err instanceof Error).should.be.ok;
+      err.message.should.equal('age: 3 is less than the minimum of 5');
+      done();
     });
     it("should fail on invalid number: above max", function(done){
       user = {
@@ -213,11 +205,10 @@ describe("schema", function(){
         age: 100,
         gender: 'male'
       };
-      validateSchema.validate(user, function(err){
-        should.exist(err);
-        err.message.should.equal('age: 100 is greater than the maximum of 90');
-        done();
-      });
+      var err = validateSchema.validate(user);
+      (err instanceof Error).should.be.ok;
+      err.message.should.equal('age: 100 is greater than the maximum of 90');
+      done();
     });
     it("should fail on enum", function(done){
       user = {
@@ -225,11 +216,10 @@ describe("schema", function(){
         age: 30,
         gender: 'lgbt'
       };
-      validateSchema.validate(user, function(err){
-        should.exist(err);
-        err.message.should.equal('gender: lgbt is not in the required list - male,female');
-        done();
-      });
+      var err = validateSchema.validate(user);
+      (err instanceof Error).should.be.ok;
+      err.message.should.equal('gender: lgbt is not in the required list - male,female');
+      done();
     });
     it("should fail on enum", function(done){
       user = {
@@ -238,11 +228,10 @@ describe("schema", function(){
         gender: 'female',
         bad: 'this'
       };
-      validateSchema.validate(user, function(err){
-        should.exist(err);
-        err.message.should.equal('bad does not exist in the definition for User');
-        done();
-      });
+      var err = validateSchema.validate(user);
+      (err instanceof Error).should.be.ok;
+      err.message.should.equal('bad does not exist in the definition for User');
+      done();
     });
     it("should default values", function(done){
       var user = {
@@ -250,11 +239,9 @@ describe("schema", function(){
         age: 30,
         gender: 'male'
       }
-      validateSchema.validate(user, function(err, updatedUser){
-        should.not.exist(err);
-        updatedUser.other.should.equal('other');
-        done();
-      });
+      var updatedUser = validateSchema.validate(user);
+      updatedUser.other.should.equal('other');
+      done();
     });
     it("should default values based on a function", function(done){
       var sample = Date.now();
@@ -263,88 +250,75 @@ describe("schema", function(){
           return Date.now();
         }}
       }, {label: 'Test'});
-      schema.validate({}, function(err, updatedSchema){
-        updatedSchema.dateNow.should.be.least(sample);
-        done();
-      });
+      var updatedSchema = schema.validate({});
+      updatedSchema.dateNow.should.be.least(sample);
+      done();
     });
     it("should fail on invalid data type", function(done){
       var schema = {
         date: {type: Date}
       };
       var badSchema = new Schema(schema, {label: 'User'});
-      badSchema.validate({date: true}, function(err, test){
-        should.exist(err);
-        err.message.should.equal('Cast to date failed for value "true"');
-        done();
-      });
+      var test = badSchema.validate({date: true});
+      (test instanceof Error).should.be.ok;
+      test.message.should.equal('Cast to date failed for value "true"');
+      done();
     });
     it("should convert to boolean:true", function(done){
       var schema = {
         bool: {type: Boolean}
       };
       var badSchema = new Schema(schema, {label: 'User'});
-      badSchema.validate({bool: 'value'}, function(err, test){
-        should.not.exist(err);
-        test.bool.should.be.equal(true);
-        done();
-      });
+      var test = badSchema.validate({bool: 'value'});
+      test.bool.should.be.equal(true);
+      done();
     });
     it("should convert to boolean:false", function(done){
       var schema = {
         bool: {type: Boolean}
       };
       var badSchema = new Schema(schema, {label: 'User'});
-      badSchema.validate({bool: 0}, function(err, test){
-        should.not.exist(err);
-        test.bool.should.be.equal(false);
-        done();
-      });
+      var test = badSchema.validate({bool: 0});
+      test.bool.should.be.equal(false);
+      done();
     });
     it("should convert to array", function(done){
       var schema = {
         arr: {type: Array}
       };
       var badSchema = new Schema(schema, {label: 'User'});
-      badSchema.validate({arr: 'sample'}, function(err, test){
-        should.not.exist(err);
-        test.arr.should.be.an.instanceOf(Array);
-        test.arr[0].should.be.equal('sample');
-        done();
-      });
+      var test = badSchema.validate({arr: 'sample'});
+      test.arr.should.be.an.instanceOf(Array);
+      test.arr[0].should.be.equal('sample');
+      done();
     });
     it("should fail on invalid number", function(done){
       var schema = {
         num: {type: Number}
       };
       var badSchema = new Schema(schema, {label: 'User'});
-      badSchema.validate({num: 'sample'}, function(err, test){
-        should.exist(err);
-        err.message.should.equal('Cast to number failed for value "sample"');
-        done();
-      });
+      var test = badSchema.validate({num: 'sample'});
+      (test instanceof Error).should.be.ok;
+      test.message.should.equal('Cast to number failed for value "sample"');
+      done();
     });
     it("should convert string to number", function(done){
       var schema = {
         num: {type: Number}
       };
       var badSchema = new Schema(schema, {label: 'User'});
-      badSchema.validate({num: '3'}, function(err, test){
-        should.not.exist(err);
-        test.num.should.equal(3);
-        done();
-      });
+      var test = badSchema.validate({num: '3'});
+      test.num.should.equal(3);
+      done();
     });
     it("should convert empty string to null", function(done){
       var schema = {
         num: {type: Number}
       };
       var badSchema = new Schema(schema, {label: 'User'});
-      badSchema.validate({num: ''}, function(err, test){
-        should.not.exist(err);
-        should.not.exist(test.num);
-        done();
-      });
+      var test = badSchema.validate({num: ''});
+      should.not.exist(test.num);
+      done();
     });
   });
   describe("indexing", function(){
@@ -361,6 +335,90 @@ describe("schema", function(){
       userSchema._indexes.should.contain('gender');
       userSchema._constraints.should.contain('age');
       userSchema._constraints.should.contain('other');
+      done();
+    });
+  });
+  describe("sub schemas", function(){
+    var tag, story, category;
+    before(function(){
+      category = new Schema({name: {type: String, required:true}, other: String}, {label: 'Category'});
+      tag = new Schema({
+        name: {type: String, required: true},
+        date: Date
+      }, {label: 'Tag'});
+
+      tag.subSchema(category, 'category', 'CATEGORY')
+
+      story = new Schema({
+        title: {type: String, required: true},
+        content: String
+      }, {label:' Story'});
+
+      story.subSchema(tag, 'tags', 'TAGGED');
+    });
+    it("should validate correctly", function(done){
+      var story1 = {
+        title: 'Story',
+        content: 'Once upon a time',
+        tags: [{
+          name: 'fairytale',
+          category: {name: 'cat1'}
+        },{
+          name: 'other',
+          category: {name: 'cat2'}
+        }]
+      };
+      var updatedStory = story.validate(story1);
+      updatedStory.title.should.equal(story1.title);
+      updatedStory.content.should.equal(story1.content);
+      updatedStory.tags[0].name.should.equal(story1.tags[0].name);
+      updatedStory.tags[1].name.should.equal(story1.tags[1].name);
+      done();
+    });
+    it("should fail validation: main node", function(done){
+      var story1 = {
+        content: 'Once upon a time',
+        tags: [{
+          name: 'fairytale',
+          category: {name: 'cat1'}
+        },{
+          name: 'other',
+          category: {name: 'cat2'}
+        }]
+      };
+      var updatedStory = story.validate(story1);
+      (updatedStory instanceof Error).should.be.ok;
+      done();
+    });
+    it("should fail validation: sub node", function(done){
+      var story1 = {
+        title: 'Story',
+        content: 'Once upon a time',
+        tags: [{
+          category: {name: 'cat1'}
+        },{
+          name: 'other',
+          category: {name: 'cat2'}
+        }]
+      };
+      var updatedStory = story.validate(story1);
+      (updatedStory instanceof Error).should.be.ok;
+      done();
+    });
+    it("should fail validation: sub-sub node", function(done){
+      var story1 = {
+        title: 'Story',
+        content: 'Once upon a time',
+        tags: [{
+          name: 'fairytale',
+          category: {other: 'test'}
+        },{
+          name: 'other',
+          category: {name: 'cat2'}
+        }]
+      };
+      var updatedStory = story.validate(story1);
+      (updatedStory instanceof Error).should.be.ok;
       done();
     });
   });

@@ -65,7 +65,7 @@ describe("schema", function(){
       userSchema._defaults.other.should.equal('other');
       done();
     });
-    it("should create a no-strict schema", function(done){
+    it("should create a non-strict schema", function(done){
       var userSchema = new Schema({first: String}, {strict: false, label: 'User'});
       userSchema._strict.should.be.false;
       done();
@@ -117,6 +117,24 @@ describe("schema", function(){
       });
       should.exist(schema.statics.blue);
       schema.statics.blue().should.equal('blue');
+      done();
+    });
+    it("should create a schema with subschemas", function(done){
+      var tag = new Schema({
+        name: String,
+        date: Date
+      }, {label: 'Tag'});
+
+      var story = new Schema({
+        title: String,
+        content: String
+      }, {label:' Story'});
+
+      story.subSchema(tag, 'tags', 'tagged');
+      story._subSchemas.length.should.equal(1);
+      story._subSchemas[0].name.should.equal('tags');
+      story._subSchemas[0].relationship.should.equal('tagged');
+      story._subSchemas[0].schema.should.equal(tag);
       done();
     });
   });
@@ -223,6 +241,30 @@ describe("schema", function(){
       validateSchema.validate(user, function(err){
         should.exist(err);
         err.message.should.equal('bad does not exist in the definition for User');
+        done();
+      });
+    });
+    it("should default values", function(done){
+      var user = {
+        first: 'name',
+        age: 30,
+        gender: 'male'
+      }
+      validateSchema.validate(user, function(err, updatedUser){
+        should.not.exist(err);
+        updatedUser.other.should.equal('other');
+        done();
+      });
+    });
+    it("should default values based on a function", function(done){
+      var sample = Date.now();
+      var schema = new Schema({
+        dateNow: {type: Date, default: function(){
+          return Date.now();
+        }}
+      }, {label: 'Test'});
+      schema.validate({}, function(err, updatedSchema){
+        updatedSchema.dateNow.should.be.least(sample);
         done();
       });
     });

@@ -1,3 +1,8 @@
+## 0.0.4 (2013-10-16)
+ - Added default functions
+ - Added subSchemas
+
+
 ## 0.0.3 (2013-10-15)
 
   - Made Schemas event emitters. Can now emit events on save etc.

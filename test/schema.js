@@ -70,6 +70,55 @@ describe("schema", function(){
       userSchema._strict.should.be.false;
       done();
     });
+    it("should create a schema with virtuals", function(done){
+      var schema = {
+        first_name: String,
+        last_name: String
+      };
+      var userSchema = new Schema(schema, {label: 'User'});
+      userSchema.virtual('name', {
+        get: function(obj){
+          return obj.first_name + ' ' + obj.last_name;
+        }
+      });
+      var user = {
+        first_name: 'Rory',
+        last_name: 'Madden'
+      }
+      userSchema.validate(user, function(err, userUpdated){
+        should.not.exist(err);
+        userUpdated.name.should.equal('Rory Madden');
+        done();
+      });
+    });
+    it("should fail on invalid virtual definition", function(done){
+      var schema = {
+        first_name: String,
+        last_name: String
+      };
+      var user = {
+        first_name: 'Rory',
+        last_name: 'Madden'
+      }
+      var userSchema = new Schema(schema, {label: 'User'});
+      try{
+        userSchema.virtual('name', {get: 'blue'});
+      }
+      catch(e){
+        should.exist(e);
+        e.message.should.equal('Invalid Virtual Format. You must provide a name and an options object with a get parameter.');
+        done();
+      }
+    });
+    it("should store static methods", function(done){
+      var schema = new Schema({},{label:'Test'});
+      schema.static('blue', function(){
+        return 'blue';
+      });
+      should.exist(schema.statics.blue);
+      schema.statics.blue().should.equal('blue');
+      done();
+    });
   });
   describe("schema validation", function(){
     before(function(done){
@@ -268,7 +317,6 @@ describe("schema", function(){
       var userSchema = new Schema(schema, {label: 'User'});
       userSchema._indexes.should.contain('first');
       userSchema._indexes.should.contain('gender');
-      userSchema._indexes.should.contain('age');
       userSchema._constraints.should.contain('age');
       userSchema._constraints.should.contain('other');
       done();

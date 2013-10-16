@@ -1,3 +1,11 @@
+## 0.0.3 (2013-10-15)
+
+  - Made Schemas event emitters. Can now emit events on save etc.
+  - Added virtuals
+  - Added static methods
+  - Added plugins
+
+
 ## 0.0.2 (2013-10-13)
 
   - Added appliedIndexes array

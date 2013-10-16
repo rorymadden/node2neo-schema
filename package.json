@@ -1,7 +1,7 @@
 {
   "name": "node2neo-schema",
   "description": "Schema support for Node2neo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": {
     "name": "Rory Madden",
     "email": "rorymadden@gmail.com"

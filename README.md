@@ -42,7 +42,7 @@ Schemas support the following data types:
 
 The following options are available for each schema item:
 1. required
-2. default
+2. default (can be a function or a value)
 3. match (supply a regular expression)
 4. String: lowercase, uppercase, trim, enum
 5. Number: min, max
@@ -55,11 +55,30 @@ var options = {
   strict: false
 }
 ```
+#### Static Methods
+You can add static methods to a schema.
+
+```js
+var schema = new Schema({
+  name: String
+}, {label: 'Blue'});
+
+schema.static('turnBlue', function(obj){
+  obj.name = 'blue';
+  return obj;
+});
+
+//using node2neo models
+var m = Model.model('Blue', schema);
+var sample = {name: 'Green'};
+sample = m.turnBlue(sample); // sample.namenow equals blue;
+```
+
 
 #### Validation
 The main point of defining a schema is for hassle free validation.
 
-````js
+``js
 var newUser = {
   first: 'Name',
   age: 30
@@ -134,12 +153,6 @@ The structure of the userSchema response is as follows:
   _appliedIndexes = [];
 }
 ```
-
-#### Coming Soon
-The features to be added shortly:
-1. Virtual attributes
-2. Methods
-3. Plugins (might be a while)
 
 ##Licence
 MIT

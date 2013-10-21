@@ -1,3 +1,7 @@
+## 0.0.5 (2013-10-16)
+ - Fixed undefined values in validation
+ - Converted validate to a synchronous function
+
 ## 0.0.4 (2013-10-16)
  - Added default functions
  - Added subSchemas

@@ -233,6 +233,17 @@ describe("schema", function(){
       err.message.should.equal('bad does not exist in the definition for User');
       done();
     });
+    it("should fail with undefined required value", function(done){
+      user = {
+        first: undefined,
+        age: 30,
+        gender: 'male'
+      }
+      var err = validateSchema.validate(user);
+      (err instanceof Error).should.be.ok;
+      err.message.should.equal('You are missing required field(s): first');
+      done();
+    });
     it("should default values", function(done){
       var user = {
         first: 'name',
@@ -241,6 +252,16 @@ describe("schema", function(){
       }
       var updatedUser = validateSchema.validate(user);
       updatedUser.other.should.equal('other');
+      done();
+    });
+
+    it("should not fail on a default of false", function(done){
+      var schema = {
+        name: {type: Boolean, default:false}
+      }
+      var boolSchema = new Schema(schema, {label: 'Bool'})
+      var updatedBool = boolSchema.validate({});
+      updatedBool.name.should.be.false;
       done();
     });
     it("should default values based on a function", function(done){

@@ -74,6 +74,52 @@ var sample = {name: 'Green'};
 sample = m.turnBlue(sample); // sample.namenow equals blue;
 ```
 
+#### Schema Wide Preparers
+Sometimes you want to perform some calculations on your data - e.g. update a field based on the values in other fields. You can add schema level preparers to a schema.
+
+Preparers are functions which take the object being created as an argument. This object must be returned after all of the changes have been made.
+
+```js
+var prepSchema = new Schema({
+  year: Number,
+  month: Number,
+  day: Number,
+  timestamp: Date,
+  approximate: Boolean
+}, {label: 'prepSchema'});
+
+prepSchema.addPreparer(function(obj){
+  if(!obj.year || !obj.month || !obj.day){
+    obj.approximate = true;
+  }
+  else {
+    obj.timestamp = new Date(obj.year, obj.month, obj.day);
+  }
+  return obj;
+});
+```
+
+#### Schema Wide Validators
+Sometimes you need to perform validations on multiple fields (e.g. it is only valid if two out of three fields are present, but any two).
+
+Validators are functions which take the object being created as an argument. Validators must return either true or false.
+```js
+var valSchema = new Schema({
+  year: Number,
+  month: Number,
+  day: Number
+}, {label: 'valSchema'});
+
+valSchema.addValidator(function(obj){
+  var keys = Object.keys(obj);
+  if(keys.length < 2){
+    return false;
+  }
+  else {
+    return true;
+  }
+})
+```
 
 #### Validation
 The main point of defining a schema is for hassle free validation.

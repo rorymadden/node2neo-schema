@@ -443,4 +443,56 @@ describe("schema", function(){
       done();
     });
   });
+  describe('custom validators and preparers', function () {
+    it('should perform a custom preparer', function (done) {
+      var prepSchema = new Schema({
+        year: Number,
+        month: Number,
+        day: Number,
+        timestamp: Date,
+        approximate: Boolean
+      }, {label: 'prepSchema'});
+
+      prepSchema.addPreparer(function(obj){
+        if(!obj.year || !obj.month || !obj.day){
+          obj.approximate = true;
+        }
+        else {
+          obj.timestamp = new Date(obj.year, obj.month, obj.day);
+        }
+        return obj;
+      })
+      prepSchema._schemaPreparers.should.have.length(1);
+      var withTime = prepSchema.validate({year: 2012, month: 6, day: 12});
+      should.exist(withTime.timestamp);
+      var approx = prepSchema.validate({year: 2012});
+      should.exist(approx.approximate);
+      should.not.exist(approx.timestamp);
+      done();
+    });
+    it('should perform a custom validation', function (done) {
+      var valSchema = new Schema({
+        year: Number,
+        month: Number,
+        day: Number,
+        timestamp: Date,
+        approximate: Boolean
+      }, {label: 'valSchema'});
+
+      valSchema.addValidator(function(obj){
+        if(!obj.year || !obj.month || !obj.day){
+          return false;
+        }
+        else {
+          return true;
+        }
+      })
+      valSchema._schemaValidators.should.have.length(1);
+      var valid = valSchema.validate({year: 2012, month: 6, day: 12});
+      (valid instanceof Error).should.not.be.ok;
+      var invalid = valSchema.validate({year: 2012});
+      (invalid instanceof Error).should.be.ok;
+      done();
+    });
+  });
 });

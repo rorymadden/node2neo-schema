@@ -1,3 +1,7 @@
+## 0.0.6 (2013-10-27)
+ - Added schema wide validators (schema.addValidator(function))
+ - Added schema wide preparers (schema.addPreparer(function))
+
 ## 0.0.5 (2013-10-16)
  - Fixed undefined values in validation
  - Converted validate to a synchronous function

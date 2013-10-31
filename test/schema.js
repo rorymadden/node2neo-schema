@@ -13,7 +13,9 @@ describe("schema", function(){
   describe("schema population", function(){
 
     it("should create a simple schema", function(done){
-      var userSchema = new Schema({first: String}, {label: 'User'});
+      var userSchema = new Schema({first: String}, {label: 'User', unique: true});
+      userSchema.label.should.equal('User');
+      userSchema._unique.should.equal(true);
       should.exist(userSchema instanceof Schema);
       userSchema._strict.should.equal(true);
       userSchema._types.first.should.equal('string');
@@ -25,6 +27,8 @@ describe("schema", function(){
       }
       var userSchema = new Schema(schema, {label: 'User'});
       userSchema._strict.should.equal(true);
+      userSchema.label.should.equal('User');
+      userSchema._unique.should.equal(false);
       userSchema._types.first.should.equal('string');
       userSchema._fields.should.contain('first');
       userSchema._required.should.contain('first');

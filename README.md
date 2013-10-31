@@ -52,7 +52,8 @@ Schemas can be defined to be strict or not, by default schemas are strict. If yo
 ```js
 var options = {
   label: 'User',
-  strict: false
+  strict: false,
+  unique: true  // sets the schema._unique flag. Can be used to CREATE UNIQUE nodes
 }
 ```
 #### Static Methods

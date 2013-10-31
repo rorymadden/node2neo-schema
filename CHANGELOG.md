@@ -1,3 +1,7 @@
+## 0.0.7 (2013-10-31)
+ - Added unique flag to schema options
+
+
 ## 0.0.6 (2013-10-27)
  - Added schema wide validators (schema.addValidator(function))
  - Added schema wide preparers (schema.addPreparer(function))

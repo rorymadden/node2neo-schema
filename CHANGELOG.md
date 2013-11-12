@@ -1,5 +1,6 @@
 ## 0.0.7 (2013-10-31)
  - Added unique flag to schema options
+ - Added field level custom validators
 
 
 ## 0.0.6 (2013-10-27)

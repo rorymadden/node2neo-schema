@@ -43,9 +43,10 @@ Schemas support the following data types:
 The following options are available for each schema item:
 1. required
 2. default (can be a function or a value)
-3. match (supply a regular expression)
-4. String: lowercase, uppercase, trim, enum
-5. Number: min, max
+3. validate (pass in a custom validator function)
+4. match (supply a regular expression)
+5. String: lowercase, uppercase, trim, enum
+6. Number: min, max
 
 Schemas can be defined to be strict or not, by default schemas are strict. If you pass in a strict:false value in the option the schema will not be strict. Strict means that only the fields defined in the schema can be saved. Any new fields will fail validation.
 

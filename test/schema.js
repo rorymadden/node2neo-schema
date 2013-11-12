@@ -448,6 +448,28 @@ describe("schema", function(){
     });
   });
   describe('custom validators and preparers', function () {
+    it('should perform a custom field validation', function (done) {
+      var validValues = ['a', 'b', 'c'];
+      var validator = function (v) {
+        return v.every(function (val) {
+          return !!~validValues.indexOf(val)
+        });
+      }
+      var fieldSchema = new Schema({
+        test: {type: Array, validate: validator}
+      }, {label: 'Field'});
+      should.exist(fieldSchema._fieldValidators.test)
+      var fail1 = fieldSchema.validate({test: 'd'});
+      fail1.message.should.equal('d is not a valid option for test');
+      var pass1 = fieldSchema.validate({test: 'a'});
+      pass1.should.be.ok;
+
+      var fail2 = fieldSchema.validate({test: ['a', 'd']});
+      fail2.message.should.equal('a,d is not a valid option for test');
+      var pass2 = fieldSchema.validate({test: ['a', 'b']});
+      pass2.should.be.ok;
+      done();
+    });
     it('should perform a custom preparer', function (done) {
       var prepSchema = new Schema({
         year: Number,

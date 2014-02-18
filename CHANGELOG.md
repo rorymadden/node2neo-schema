@@ -1,3 +1,6 @@
+## 0.0.8 (2014-02-18)
+ - Added code to error messages
+
 ## 0.0.7 (2013-10-31)
  - Added unique flag to schema options
  - Added field level custom validators

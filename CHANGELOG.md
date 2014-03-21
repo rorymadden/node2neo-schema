@@ -1,3 +1,6 @@
+## 0.0.9 (2014-02-18)
+ - Fix error messages
+
 ## 0.0.8 (2014-02-18)
  - Added code to error messages
 
